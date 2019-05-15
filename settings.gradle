@@ -1,0 +1,2 @@
+include ':app', ':lib_calendar_picker'
+rootProject.name='EhiCalendarView'
