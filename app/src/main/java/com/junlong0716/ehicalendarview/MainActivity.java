@@ -18,17 +18,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        MonthView mv = findViewById(R.id.mv);
-        mv.setCalendarParams(2019, 6, getBitmap());
-    }
-
-    private Bitmap getBitmap() {
-        Drawable drawable = getResources().getDrawable(R.drawable.shape_selected);
-        Canvas canvas = new Canvas();
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-        canvas.setBitmap(bitmap);
-        drawable.setBounds(0, 0, drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
-        drawable.draw(canvas);
-        return bitmap;
+//        MonthView mv = findViewById(R.id.mv);
+//        mv.setCalendarParams(2019, 6);
     }
 }

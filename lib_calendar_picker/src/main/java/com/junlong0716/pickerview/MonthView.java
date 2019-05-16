@@ -1,7 +1,6 @@
 package com.junlong0716.pickerview;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -12,9 +11,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-
 import androidx.annotation.Nullable;
-
 import java.util.Calendar;
 
 public class MonthView extends View {
@@ -49,7 +46,6 @@ public class MonthView extends View {
     private Calendar mCalendar = Calendar.getInstance();
     //选中的日期
     private int mSelectDay = 0;
-    private Bitmap mSelectBitmap;
 
     public MonthView(Context context) {
         super(context);
@@ -100,8 +96,7 @@ public class MonthView extends View {
         mCalendar.setFirstDayOfWeek(Calendar.SUNDAY);
     }
 
-    public void setCalendarParams(int year, int month, Bitmap selectBitmap) {
-        mSelectBitmap = selectBitmap;
+    public void setCalendarParams(int year, int month) {
         if (isValidMonth(month - 1))
             mMonth = month - 1;
         mYear = year;
@@ -256,7 +251,6 @@ public class MonthView extends View {
     }
 
     private void drawSelectedTextLightBg(Canvas canvas, float x, float y) {
-        if (mSelectBitmap == null) return;
         canvas.drawRoundRect(new RectF(x - 60, y - 60, x + 60, y + 60), 8, 8, mSelectedPaint);
     }
 
