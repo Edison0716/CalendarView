@@ -150,6 +150,8 @@ public class MonthView extends View {
                 mSelectDay = getDaysLocation(x, y);
                 Log.d("mSelectDay", mSelectDay + "");
                 break;
+            case MotionEvent.ACTION_UP:
+                break;
         }
         invalidate();
         return true;
