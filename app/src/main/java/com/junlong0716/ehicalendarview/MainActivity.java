@@ -18,7 +18,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        MonthView mv = findViewById(R.id.mv);
-//        mv.setCalendarParams(2019, 6);
+        MonthView mv = findViewById(R.id.mv);
+        mv.setCalendarParams(2019, 6);
+        mv.setOnViewCheckedListener(new MonthView.OnViewCheckedListener() {
+            @Override
+            public void onViewCheckedListener(String date) {
+                finish();
+            }
+        });
     }
 }

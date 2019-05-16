@@ -46,6 +46,7 @@ public class MonthView extends View {
     private Calendar mCalendar = Calendar.getInstance();
     //选中的日期
     private int mSelectDay = 0;
+    private OnViewCheckedListener mOnViewCheckedListener;
 
     public MonthView(Context context) {
         super(context);
@@ -150,7 +151,11 @@ public class MonthView extends View {
                 mSelectDay = getDaysLocation(x, y);
                 Log.d("mSelectDay", mSelectDay + "");
                 break;
+            case MotionEvent.ACTION_MOVE:
+                break;
             case MotionEvent.ACTION_UP:
+                //todo 选中的时间返回
+                mOnViewCheckedListener.onViewCheckedListener("");
                 break;
         }
         invalidate();
@@ -253,7 +258,7 @@ public class MonthView extends View {
     }
 
     private void drawSelectedTextLightBg(Canvas canvas, float x, float y) {
-        canvas.drawRoundRect(new RectF(x - 60, y - 60, x + 60, y + 60), 8, 8, mSelectedPaint);
+        canvas.drawRoundRect(new RectF(x - mCellWith / 2f + 10, y - mCellHeight / 2f + 10, x + mCellWith / 2f - 10, y + mCellHeight / 2f - 10), 10, 10, mSelectedPaint);
     }
 
     private void drawDesText(Canvas canvas, String des, float x, float y) {
@@ -283,5 +288,13 @@ public class MonthView extends View {
         } else {
             return offset;
         }
+    }
+
+    public void setOnViewCheckedListener(OnViewCheckedListener onViewCheckedListener){
+        this.mOnViewCheckedListener = onViewCheckedListener;
+    }
+
+    public interface OnViewCheckedListener{
+        void onViewCheckedListener(String date);
     }
 }
