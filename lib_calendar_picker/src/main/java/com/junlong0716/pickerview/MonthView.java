@@ -11,7 +11,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+
 import androidx.annotation.Nullable;
+
 import java.util.Calendar;
 
 public class MonthView extends View {
@@ -36,7 +38,7 @@ public class MonthView extends View {
     //一个格子的宽高
     private int mCellWith;
     private int mCellHeight;
-    //
+    //一号是从星期几开始滴
     private int mDayOfWeekStart = 0;
     //起始时间
     private int mWeekStart = 0;
@@ -142,20 +144,30 @@ public class MonthView extends View {
         setMeasuredDimension(widthMeasureSpec, resolveSize(targetHeight, heightMeasureSpec));
     }
 
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int x = (int) (event.getX() + 0.5f);
         int y = (int) (event.getY() + 0.5f);
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
+                performClick();
                 mSelectDay = getDaysLocation(x, y);
-                Log.d("mSelectDay", mSelectDay + "");
-                break;
+                //todo test
+                if (mSelectDay >= 15)
+                    return true;
+                else
+                    return false;
             case MotionEvent.ACTION_MOVE:
                 break;
             case MotionEvent.ACTION_UP:
-                //todo 选中的时间返回
-                mOnViewCheckedListener.onViewCheckedListener("");
+                //todo test
+                mOnViewCheckedListener.onViewCheckedListener(mYear, mMonth + 1, mSelectDay);
                 break;
         }
         invalidate();
@@ -230,13 +242,12 @@ public class MonthView extends View {
             if (mSelectDay == day)
                 drawSelectedTextLightBg(canvas, (float) colCenter, rowHeightCenter);
 
-            if (mSelectDay == day){
+            if (mSelectDay == day) {
                 drawSelectedText(canvas, String.valueOf(day), (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(8, mContext));
                 drawSelectedDesText(canvas, "￥155", (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext));
-            }
-            else{
+            } else {
                 drawDesText(canvas, "￥155", (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext));
-                drawText(canvas, String.valueOf(day), (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(8, mContext));
+                drawText(canvas, day, (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(8, mContext));
             }
 
             //绘制到了最后一个格子 则从头开始
@@ -266,9 +277,15 @@ public class MonthView extends View {
         canvas.drawText(des, x, y, mDesTextPaint);
     }
 
-    private void drawText(Canvas canvas, String dayString, float x, float y) {
+    private void drawText(Canvas canvas, int day, float x, float y) {
         //todo 判断昨天 变灰
-        canvas.drawText(dayString, x, y, mTextPaint);
+        if (day < 15) {
+            mTextPaint.setColor(Color.parseColor("#cccccc"));
+            canvas.drawText(day + "", x, y, mTextPaint);
+        } else {
+            mTextPaint.setColor(Color.parseColor("#333333"));
+            canvas.drawText(day + "", x, y, mTextPaint);
+        }
     }
 
     private boolean isValidMonth(int month) {
@@ -290,11 +307,11 @@ public class MonthView extends View {
         }
     }
 
-    public void setOnViewCheckedListener(OnViewCheckedListener onViewCheckedListener){
+    public void setOnViewCheckedListener(OnViewCheckedListener onViewCheckedListener) {
         this.mOnViewCheckedListener = onViewCheckedListener;
     }
 
-    public interface OnViewCheckedListener{
-        void onViewCheckedListener(String date);
+    public interface OnViewCheckedListener {
+        void onViewCheckedListener(int mYear, int mMonth, int mSelectDay);
     }
 }
