@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,12 +21,18 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     private Context mContext;
     private List<CalenderBean> mList;
+    private OnDayCheckedCallback mOnDayClickedCallback;
 
 
     RecyclerViewAdapter(Context context, List<CalenderBean> list) {
         this.mContext = context;
         this.mList = list;
     }
+
+    public void setOnDayCheckedListener(OnDayCheckedCallback onDayCheckedCallback) {
+        this.mOnDayClickedCallback = onDayCheckedCallback;
+    }
+
 
     @NonNull
     @Override
@@ -42,9 +49,22 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerViewAdapter.ViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final RecyclerViewAdapter.ViewHolder holder, final int position) {
         holder.mv.setCalendarParams(mList.get(position).getYear(), mList.get(position).getMonth());
+        holder.mv.setchecedDay(mList.get(position).getSetCheckedDay());
+        holder.mv.setOnViewCheckedListener(new MonthView.OnViewCheckedListener() {
+            @Override
+            public void onViewCheckedListener(int mYear, int mMonth, int mSelectDay) {
+                mOnDayClickedCallback.setOnDayCheckedListener(mSelectDay, position);
+                Toast.makeText(mContext, mYear + "-" + mMonth + "-" + mSelectDay, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
+    public interface OnDayCheckedCallback {
+        void setOnDayCheckedListener(int mSelectDay, int position);
+    }
+
 
     @Override
     public int getItemCount() {

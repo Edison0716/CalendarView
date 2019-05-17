@@ -119,6 +119,11 @@ public class MonthView extends View {
         requestLayout();
     }
 
+    public void setchecedDay(int day) {
+        mSelectDay = day;
+        invalidate();
+    }
+
     private int getDaysInMonth(int year, int month) {
         int days;
         if (month == Calendar.FEBRUARY) {
@@ -158,20 +163,33 @@ public class MonthView extends View {
             case MotionEvent.ACTION_DOWN:
                 performClick();
                 mSelectDay = getDaysLocation(x, y);
+
                 //todo test
-                if (mSelectDay >= 15)
+                if (mSelectDay >= 15){
+                    mOnViewCheckedListener.onViewCheckedListener(mYear, mMonth + 1, mSelectDay);
                     return true;
+                }
                 else
                     return false;
+
             case MotionEvent.ACTION_MOVE:
+
                 break;
             case MotionEvent.ACTION_UP:
                 //todo test
-                mOnViewCheckedListener.onViewCheckedListener(mYear, mMonth + 1, mSelectDay);
+
                 break;
         }
         invalidate();
         return true;
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        //不拦截down事件
+        if (event.getAction() == MotionEvent.ACTION_DOWN)
+            getParent().requestDisallowInterceptTouchEvent(true);
+        return super.dispatchTouchEvent(event);
     }
 
     //根据位置信息找到选中的天数
@@ -246,7 +264,7 @@ public class MonthView extends View {
                 drawSelectedText(canvas, String.valueOf(day), (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(8, mContext));
                 drawSelectedDesText(canvas, "￥155", (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext));
             } else {
-                drawDesText(canvas, "￥155", (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext));
+                drawDesText(canvas, "￥155", (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext),day);
                 drawText(canvas, day, (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(8, mContext));
             }
 
@@ -272,9 +290,14 @@ public class MonthView extends View {
         canvas.drawRoundRect(new RectF(x - mCellWith / 2f + 10, y - mCellHeight / 2f + 10, x + mCellWith / 2f - 10, y + mCellHeight / 2f - 10), 10, 10, mSelectedPaint);
     }
 
-    private void drawDesText(Canvas canvas, String des, float x, float y) {
-        mDesTextPaint.setColor(Color.parseColor("#FF7E00"));
-        canvas.drawText(des, x, y, mDesTextPaint);
+    private void drawDesText(Canvas canvas, String des, float x, float y, int day) {
+        //todo test
+        if (day < 15){
+            canvas.drawText("", x, y, mDesTextPaint);
+        }else {
+            mDesTextPaint.setColor(Color.parseColor("#FF7E00"));
+            canvas.drawText(des, x, y, mDesTextPaint);
+        }
     }
 
     private void drawText(Canvas canvas, int day, float x, float y) {
@@ -293,7 +316,7 @@ public class MonthView extends View {
     }
 
     private boolean isValidDay(int day) {
-        return day >= 1 && day <= 31;
+        return day >= 1 && day <= mDaysInMonth;
     }
 
 

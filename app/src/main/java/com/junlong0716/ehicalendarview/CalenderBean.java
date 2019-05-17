@@ -6,7 +6,16 @@ package com.junlong0716.ehicalendarview;
 public class CalenderBean {
     private int month;
     private int year;
+    private int setCheckedDay;
     private String groupName;
+
+    public int getSetCheckedDay() {
+        return setCheckedDay;
+    }
+
+    public void setSetCheckedDay(int setCheckedDay) {
+        this.setCheckedDay = setCheckedDay;
+    }
 
     public int getMonth() {
         return month;
