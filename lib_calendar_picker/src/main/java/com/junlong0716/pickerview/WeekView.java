@@ -73,14 +73,14 @@ public class WeekView extends View {
     private void startDrawText(Canvas canvas) {
         //找中间线
         float halfLineHeight = (mWeekPaint.ascent() + mWeekPaint.descent()) / 2f;
-        float helfHeight = mTextHeight / 2 + getPaddingTop();
+        float halfHeight = mTextHeight / 2 + getPaddingTop();
         for (int i = 0; i < mDaysInWeek; i++) {
             if (mWeekContent.get(i).equals("日") || mWeekContent.get(i).equals("六")) {
                 mWeekPaint.setColor(Color.parseColor("#FF3A30"));
             } else {
                 mWeekPaint.setColor(Color.parseColor("#7B7B7B"));
             }
-            canvas.drawText(mWeekContent.get(i), (float) (mTextWidth * i + mTextWidth / 2), helfHeight - halfLineHeight, mWeekPaint);
+            canvas.drawText(mWeekContent.get(i), (float) (mTextWidth * i + mTextWidth / 2), halfHeight - halfLineHeight, mWeekPaint);
         }
     }
 

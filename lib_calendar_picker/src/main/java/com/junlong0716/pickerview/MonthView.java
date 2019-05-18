@@ -42,7 +42,6 @@ public class MonthView extends View {
     private int mDayOfWeekStart = 0;
     //起始时间
     private int mWeekStart = 0;
-    private int mMonthHeight = 0;
     private int mYear = 0;
     private int mMonth = 0;
     private Calendar mCalendar = Calendar.getInstance();
@@ -144,7 +143,7 @@ public class MonthView extends View {
         mCellWith = (MeasureSpec.getSize(widthMeasureSpec) - getPaddingLeft() - getPaddingRight()) / mDaysInWeek;
         mCellHeight = mCellWith;
         //目标高度
-        int targetHeight = mCellHeight * mMaxWeeksLinesInMonth + getPaddingTop() + getPaddingBottom() + mMonthHeight;
+        int targetHeight = mCellHeight * mMaxWeeksLinesInMonth + getPaddingTop() + getPaddingBottom();
         //测量
         setMeasuredDimension(widthMeasureSpec, resolveSize(targetHeight, heightMeasureSpec));
     }
@@ -194,13 +193,13 @@ public class MonthView extends View {
 
     //根据位置信息找到选中的天数
     private int getDaysLocation(int x, int y) {
-        int paddedX = x - getPaddingLeft();
+        int paddedX = x - getPaddingLeft(); //点击坐标距离控件左边的距离
         if (paddedX < 0 || paddedX >= mPaddedWidth) return -1;
         int paddedY = y - getPaddingTop();
-        if (paddedY < mMonthHeight || paddedY >= mPaddedHeight) return -1;
-        int row = (paddedY - mMonthHeight) / mCellHeight; //行高 点击位置所在的第几行
+        if (paddedY < 0 || paddedY >= mPaddedHeight) return -1;
+        int row = paddedY / mCellHeight; //行高 点击位置所在的第几行
         int col = paddedX * mDaysInWeek / mPaddedWidth; //列宽 点击位置所在的第几列
-        int index = col + row * mDaysInWeek;//点击在第几个格子 一行7个数字 行数 * 7 + 列数 = 日期天
+        int index = col + row * mDaysInWeek;//点击在第几个格子 一行7个数字 第几行 * 7 + 第几列 = 日期天
         int selectDay = index + 1 - getDayOffset();//这里应该去掉之前的空格
         Log.d("selectedDay", selectDay + "");
         if (isValidDay(selectDay)) return selectDay;
@@ -242,8 +241,7 @@ public class MonthView extends View {
         //列宽
         int colWidth = mCellWith;
         int colOffset = getDayOffset();
-        //todo monthHeight
-        int rowHeightCenter = rowHeight / 2 + mMonthHeight;
+        int rowHeightCenter = rowHeight / 2;
         float halfTextLineHeight = (mTextPaint.descent() + mTextPaint.ascent()) / 2f;
 
         for (int day = 1; day <= mDaysInMonth; day++) {
@@ -320,7 +318,7 @@ public class MonthView extends View {
     }
 
 
-    //计算月份第一个格子的偏移量
+    //计算格子的偏移量
     private int getDayOffset() {
         int offset = mDayOfWeekStart - mWeekStart;
         if (mDayOfWeekStart < mWeekStart) {
