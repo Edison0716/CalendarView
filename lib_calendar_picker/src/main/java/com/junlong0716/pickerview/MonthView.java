@@ -162,10 +162,9 @@ public class MonthView extends View {
             case MotionEvent.ACTION_DOWN:
                 performClick();
                 mSelectDay = getDaysLocation(x, y);
-
                 //todo test
                 if (mSelectDay >= 15){
-                    mOnViewCheckedListener.onViewCheckedListener(mYear, mMonth + 1, mSelectDay);
+
                     return true;
                 }
                 else
@@ -176,8 +175,12 @@ public class MonthView extends View {
                 break;
             case MotionEvent.ACTION_UP:
                 //todo test
-
-                break;
+                if (mSelectDay >= 15){
+                    mOnViewCheckedListener.onViewCheckedListener(mYear, mMonth + 1, mSelectDay);
+                    return true;
+                }
+                else
+                    return false;
         }
         invalidate();
         return true;
