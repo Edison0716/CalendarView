@@ -19,8 +19,27 @@
  ```
 ##### 食用方法
 
-` holder.mv.setCalendarParams(mList.get(position).getYear(), mList.get(position).getMonth(),mList.get(position).getDays());`
+ ```
+    //日期Day需要继承DayBaseEntity
+    public class DayBaseEntity {
+        private int day;
+        private String des;
+        private boolean isDisable;
+    }
+    
+    //例如
+    public class CalenderBean {
+    private int month;
+    private int year;
+    private int setCheckedDay;
+    private List<Day> days;
+    private String groupName;
+    //省略get set
+    public static class Day extends DayBaseEntity{}
+    }
 
+    holder.mv.setCalendarParams(mList.get(position).getYear(), mList.get(position).getMonth(),mList.get(position).getDays());
+ ```   
 ### 展示
 
 <img src="https://github.com/Edison0716/CalendarView/blob/master/screen_shot/calendar_view1.jpg" width="360"/>
