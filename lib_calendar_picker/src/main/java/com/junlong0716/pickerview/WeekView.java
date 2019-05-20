@@ -7,11 +7,19 @@ import android.graphics.Paint;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.View;
+
 import androidx.annotation.Nullable;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * FileName: MonthView
+ * Author:   EdisonLi的Windows
+ * Date:     2019/5/15 15:23
+ * Description:
+ */
 public class WeekView extends View {
     private int mDaysInWeek = 7;//一周七天
     private TextPaint mWeekPaint;//文字画笔

@@ -20,14 +20,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         MonthView mv = findViewById(R.id.mv);
-        mv.setCalendarParams(2019, 2);
-        mv.setVisibility(View.GONE);
-        mv.setOnViewCheckedListener(new MonthView.OnViewCheckedListener() {
-            @Override
-            public void onViewCheckedListener(int mYear, int mMonth, int mSelectDay) {
-                Toast.makeText(MainActivity.this, mYear + "-" + mMonth + "-" + mSelectDay, Toast.LENGTH_SHORT).show();
-            }
-        });
+//        mv.setCalendarParams(2019, 2, );
+//        mv.setVisibility(View.GONE);
+//        mv.setOnViewCheckedListener(new MonthView.OnViewCheckedListener() {
+//            @Override
+//            public void onViewCheckedListener(int mYear, int mMonth, int mSelectDay) {
+//                Toast.makeText(MainActivity.this, mYear + "-" + mMonth + "-" + mSelectDay, Toast.LENGTH_SHORT).show();
+//            }
+//        });
 
         final List<CalenderBean> calendarList = new ArrayList<>();
 
@@ -40,6 +40,22 @@ public class MainActivity extends AppCompatActivity {
             else
                 calenderBean.setSetCheckedDay(0);
             calenderBean.setMonth(i);
+            List<CalenderBean.Day> days = new ArrayList<>();
+            CalenderBean.Day day;
+            for (int j = 1; j <= 20; j++) {
+                day = new CalenderBean.Day();
+                day.setDay(j + 1);
+
+                if (j % 2 == 0){
+                    day.setDes("￥155");
+                    day.setDisable(false);
+                } else{
+                    day.setDes("");
+                    day.setDisable(true);
+                }
+                days.add(day);
+            }
+            calenderBean.setDays(days);
             calendarList.add(calenderBean);
         }
 

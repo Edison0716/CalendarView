@@ -9,13 +9,21 @@ import android.graphics.Typeface;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 
 import java.util.Calendar;
+import java.util.List;
 
+/**
+ * FileName: MonthView
+ * Author:   EdisonLi的Windows
+ * Date:     2019/5/15 16:45
+ * Description:
+ */
 public class MonthView extends View {
     private Context mContext;
     //文字画笔
@@ -48,6 +56,8 @@ public class MonthView extends View {
     //选中的日期
     private int mSelectDay = 0;
     private OnViewCheckedListener mOnViewCheckedListener;
+    //单个日期的信息
+    private SparseArray<DayBaseEntity> mDaysInfo;
 
     public MonthView(Context context) {
         super(context);
@@ -98,7 +108,10 @@ public class MonthView extends View {
         mCalendar.setFirstDayOfWeek(Calendar.SUNDAY);
     }
 
-    public void setCalendarParams(int year, int month) {
+    public void setCalendarParams(int year, int month, List<? extends DayBaseEntity> daysInfo) {
+        mDaysInfo = new SparseArray<>();
+        for (DayBaseEntity day : daysInfo)
+            mDaysInfo.append(day.getDay(), day);
         if (isValidMonth(month - 1))
             mMonth = month - 1;
         mYear = year;
@@ -108,7 +121,6 @@ public class MonthView extends View {
         mDaysInMonth = getDaysInMonth(mYear, mMonth);
         mDayOfWeekStart = mCalendar.get(Calendar.DAY_OF_WEEK);
         mWeekStart = mCalendar.getFirstDayOfWeek();
-
         //判断最大行数
         if (mDayOfWeekStart == 6 && mDaysInMonth == 31)
             mMaxWeeksLinesInMonth = 6;
@@ -118,7 +130,7 @@ public class MonthView extends View {
         requestLayout();
     }
 
-    public void setchecedDay(int day) {
+    public void setCheckedDay(int day) {
         mSelectDay = day;
         invalidate();
     }
@@ -162,25 +174,21 @@ public class MonthView extends View {
             case MotionEvent.ACTION_DOWN:
                 performClick();
                 mSelectDay = getDaysLocation(x, y);
-                //todo test
-                if (mSelectDay >= 15){
-
-                    return true;
-                }
-                else
+                if (mDaysInfo.get(mSelectDay) == null) {
                     return false;
-
-            case MotionEvent.ACTION_MOVE:
-
-                break;
+                } else
+                    return !mDaysInfo.get(mSelectDay).isDisable();
             case MotionEvent.ACTION_UP:
-                //todo test
-                if (mSelectDay >= 15){
-                    mOnViewCheckedListener.onViewCheckedListener(mYear, mMonth + 1, mSelectDay);
-                    return true;
-                }
-                else
+                if (mDaysInfo.get(mSelectDay) == null) {
                     return false;
+                } else {
+                    if (mDaysInfo.get(mSelectDay).isDisable()) {
+                        return false;
+                    } else {
+                        mOnViewCheckedListener.onViewCheckedListener(mYear, mMonth + 1, mSelectDay);
+                        return true;
+                    }
+                }
         }
         invalidate();
         return true;
@@ -248,6 +256,15 @@ public class MonthView extends View {
         float halfTextLineHeight = (mTextPaint.descent() + mTextPaint.ascent()) / 2f;
 
         for (int day = 1; day <= mDaysInMonth; day++) {
+            boolean isDisable = true;
+            String des;
+            if (mDaysInfo.get(day) == null)
+                des = "";
+            else {
+                isDisable = mDaysInfo.get(day).isDisable();
+                des = mDaysInfo.get(day).getDes();
+            }
+
             //每个月的一号并不都顶格 计算起始点
             int cellStartX = colWidth * colOffset;
             int cellStartY = rowHeightCenter - rowHeight / 2;
@@ -263,10 +280,10 @@ public class MonthView extends View {
 
             if (mSelectDay == day) {
                 drawSelectedText(canvas, String.valueOf(day), (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(8, mContext));
-                drawSelectedDesText(canvas, "￥155", (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext));
+                drawSelectedDesText(canvas, des, (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext));
             } else {
-                drawDesText(canvas, "￥155", (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext),day);
-                drawText(canvas, day, (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(8, mContext));
+                drawDesText(canvas, des, (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext), isDisable);
+                drawText(canvas, day, (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(8, mContext), isDisable);
             }
 
             //绘制到了最后一个格子 则从头开始
@@ -291,19 +308,17 @@ public class MonthView extends View {
         canvas.drawRoundRect(new RectF(x - mCellWith / 2f + 10, y - mCellHeight / 2f + 10, x + mCellWith / 2f - 10, y + mCellHeight / 2f - 10), 10, 10, mSelectedPaint);
     }
 
-    private void drawDesText(Canvas canvas, String des, float x, float y, int day) {
-        //todo test
-        if (day < 15){
+    private void drawDesText(Canvas canvas, String des, float x, float y, boolean isDisable) {
+        if (isDisable) {
             canvas.drawText("", x, y, mDesTextPaint);
-        }else {
+        } else {
             mDesTextPaint.setColor(Color.parseColor("#FF7E00"));
             canvas.drawText(des, x, y, mDesTextPaint);
         }
     }
 
-    private void drawText(Canvas canvas, int day, float x, float y) {
-        //todo 判断昨天 变灰
-        if (day < 15) {
+    private void drawText(Canvas canvas, int day, float x, float y, boolean isDisable) {
+        if (isDisable) {
             mTextPaint.setColor(Color.parseColor("#cccccc"));
             canvas.drawText(day + "", x, y, mTextPaint);
         } else {

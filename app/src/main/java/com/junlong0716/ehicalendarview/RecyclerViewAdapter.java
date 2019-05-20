@@ -50,8 +50,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
     @Override
     public void onBindViewHolder(@NonNull final RecyclerViewAdapter.ViewHolder holder, final int position) {
-        holder.mv.setCalendarParams(mList.get(position).getYear(), mList.get(position).getMonth());
-        holder.mv.setchecedDay(mList.get(position).getSetCheckedDay());
+        holder.mv.setCalendarParams(mList.get(position).getYear(), mList.get(position).getMonth(),mList.get(position).getDays());
+        holder.mv.setCheckedDay(mList.get(position).getSetCheckedDay());
         holder.mv.setOnViewCheckedListener(new MonthView.OnViewCheckedListener() {
             @Override
             public void onViewCheckedListener(int mYear, int mMonth, int mSelectDay) {
