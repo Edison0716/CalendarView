@@ -28,6 +28,8 @@
         app:calendarDayDisableTextColor="@color/calendarDayDisableTextColor"<!--日期不可用的颜色值-->
         app:calendarDesCheckedTextColor="@color/calendarDayCheckedTextColor"<!--描述选中的文字字体颜色-->
         app:calendarDesCommonTextColor="@color/calendarDesCommonTextColor"<!--日期描述正常显示颜色值-->
+        app:calendarDayTextSize="16dp"<!--日期文字大小-->
+        app:calendarDesTextSize="14dp"<!--描述文字大小-->
         />
  ```
 ##### 食用方法

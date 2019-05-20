@@ -8,5 +8,7 @@
         <attr name="calendarDayCheckedLightColor" format="color|reference" />
         <attr name="calendarDayCheckedLightRadius" format="dimension|reference"/>
         <attr name="calendarDayDisableTextColor" format="color|reference"/>
+        <attr name="calendarDayTextSize" format="dimension|reference"/>
+        <attr name="calendarDesTextSize" format="dimension|reference"/>
     </declare-styleable>
 </resources>

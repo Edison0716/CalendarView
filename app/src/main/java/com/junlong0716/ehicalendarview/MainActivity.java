@@ -42,17 +42,11 @@ public class MainActivity extends AppCompatActivity {
             calenderBean.setMonth(i);
             List<CalenderBean.Day> days = new ArrayList<>();
             CalenderBean.Day day;
-            for (int j = 1; j <= 20; j++) {
+            for (int j = 1; j <= 28; j++) {
                 day = new CalenderBean.Day();
-                day.setDay(j + 1);
-
-                if (j % 2 == 0){
-                    day.setDes("￥155");
-                    day.setDisable(false);
-                } else{
-                    day.setDes("");
-                    day.setDisable(true);
-                }
+                day.setDay(j);
+                day.setDes("￥155");
+                day.setDisable(false);
                 days.add(day);
             }
             calenderBean.setDays(days);

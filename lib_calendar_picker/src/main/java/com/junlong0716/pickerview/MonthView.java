@@ -72,6 +72,10 @@ public class MonthView extends View {
     private int mCalendarDesCheckedTextColor;
     //选中的背景圆角
     private int mCalendarDayCheckedLightRadius;
+    //日期文字大小
+    private int mCalendarDayTextSize;
+    //描述文字大小
+    private int mCalendarDesTextSize;
 
 
     public MonthView(Context context) {
@@ -104,6 +108,8 @@ public class MonthView extends View {
         mCalendarDayCheckedTextColor = typedArray.getColor(R.styleable.MonthView_calendarDayCheckedTextColor, getResources().getColor(R.color.calendarDayCheckedTextColor));
         mCalendarDesCheckedTextColor = typedArray.getColor(R.styleable.MonthView_calendarDesCheckedTextColor, getResources().getColor(R.color.calendarDayCheckedTextColor));
         mCalendarDayCheckedLightRadius = (int) typedArray.getDimension(R.styleable.MonthView_calendarDayCheckedLightRadius, 0);
+        mCalendarDayTextSize = (int) typedArray.getDimension(R.styleable.MonthView_calendarDayTextSize, 14);
+        mCalendarDesTextSize = (int) typedArray.getDimension(R.styleable.MonthView_calendarDesTextSize, 12);
         typedArray.recycle();
     }
 
@@ -113,13 +119,13 @@ public class MonthView extends View {
         mTextPaint.setColor(mCalendarDayCommonTextColor);
         Typeface boldFont = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
         mTextPaint.setTypeface(boldFont);
-        mTextPaint.setTextSize(ConvertUtil.dp2px(16f, mContext));
+        mTextPaint.setTextSize(mCalendarDayTextSize);
         mTextPaint.setTextAlign(Paint.Align.CENTER);
 
         mDesTextPaint = new TextPaint();
         mDesTextPaint.setAntiAlias(true);
         mDesTextPaint.setColor(mCalendarDesCommonTextColor);
-        mDesTextPaint.setTextSize(ConvertUtil.dp2px(12f, mContext));
+        mDesTextPaint.setTextSize(mCalendarDesTextSize);
         mDesTextPaint.setTextAlign(Paint.Align.CENTER);
 
         mSelectedPaint = new Paint();
@@ -132,7 +138,7 @@ public class MonthView extends View {
         mTextSelectedPaint.setColor(mCalendarDayCheckedTextColor);
         mTextSelectedPaint.setAntiAlias(true);
         mTextSelectedPaint.setTypeface(boldFont);
-        mTextSelectedPaint.setTextSize(ConvertUtil.dp2px(16f, mContext));
+        mTextSelectedPaint.setTextSize(mCalendarDayTextSize);
         mTextSelectedPaint.setTextAlign(Paint.Align.CENTER);
 
         mCalendar.setFirstDayOfWeek(Calendar.SUNDAY);
@@ -190,7 +196,6 @@ public class MonthView extends View {
         setMeasuredDimension(widthMeasureSpec, resolveSize(targetHeight, heightMeasureSpec));
     }
 
-
     @Override
     public boolean performClick() {
         return super.performClick();
@@ -208,6 +213,13 @@ public class MonthView extends View {
                     return false;
                 } else
                     return !mDaysInfo.get(mSelectDay).isDisable();
+            case MotionEvent.ACTION_MOVE:
+                Log.d("fuckY",event.getY() + "");
+                if (mDaysInfo.get(mSelectDay) == null || event.getY() > 1 || event.getY() < 1) {
+                    getParent().requestDisallowInterceptTouchEvent(false);
+                    return false;
+                } else
+                    return !mDaysInfo.get(mSelectDay).isDisable();
             case MotionEvent.ACTION_UP:
                 if (mDaysInfo.get(mSelectDay) == null) {
                     return false;
@@ -215,20 +227,41 @@ public class MonthView extends View {
                     if (mDaysInfo.get(mSelectDay).isDisable()) {
                         return false;
                     } else {
+                        invalidate();
                         mOnViewCheckedListener.onViewCheckedListener(mYear, mMonth + 1, mSelectDay);
                         return true;
                     }
                 }
         }
-        invalidate();
         return true;
     }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        //不拦截down事件
-        if (event.getAction() == MotionEvent.ACTION_DOWN)
-            getParent().requestDisallowInterceptTouchEvent(true);
+        int downY = 0;
+        int upY = 0;
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                downY = (int) (event.getY() + 0.5f);
+                Log.d("down", downY + "");
+                break;
+            case MotionEvent.ACTION_UP:
+                upY = (int) (event.getY() + 0.5f);
+                Log.d("up", upY + "");
+                break;
+        }
+
+        Log.d("up", upY + "");
+
+        if (Math.abs(downY) - Math.abs(upY) > 10 || Math.abs(downY) - Math.abs(upY) < -10) {
+            getParent().requestDisallowInterceptTouchEvent(false);
+        } else {
+            //不拦截down事件
+            if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE)
+                getParent().requestDisallowInterceptTouchEvent(true);
+        }
+
         return super.dispatchTouchEvent(event);
     }
 

@@ -16,7 +16,9 @@
         app:calendarDayCommonTextColor="@color/calendarDayCommonTextColor"
         app:calendarDayDisableTextColor="@color/calendarDayDisableTextColor"
         app:calendarDesCheckedTextColor="@color/calendarDayCheckedTextColor"
-        app:calendarDesCommonTextColor="@color/calendarDesCommonTextColor" />
+        app:calendarDesCommonTextColor="@color/calendarDesCommonTextColor"
+        app:calendarDayTextSize="16dp"
+        app:calendarDesTextSize="14dp"/>
 
 
 </LinearLayout>
