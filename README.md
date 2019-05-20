@@ -3,6 +3,19 @@
 ##### 由于Rv嵌套Rv的方式 性能太差 只好绘制出日历了
 
  ```
+    allprojects {
+		repositories {
+			...
+			maven { url 'https://jitpack.io' }
+		}
+	}
+ 
+    dependencies {
+	        implementation 'com.github.Edison0716:CalendarView:Tag'
+	}
+ ```
+
+ ```
    <com.junlong0716.pickerview.MonthView
         android:id="@+id/mv"
         android:layout_width="match_parent"
