@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="calendarDayCommonTextColor">#333333</color>
+    <color name="calendarDesCommonTextColor">#FF7E00</color>
+    <color name="calendarDayDisableTextColor">#CCCCCC</color>
+    <color name="calendarDayCheckedLightColor">#29B7B7</color>
+    <color name="calendarDayCheckedTextColor">#FFFFFF</color>
+</resources>

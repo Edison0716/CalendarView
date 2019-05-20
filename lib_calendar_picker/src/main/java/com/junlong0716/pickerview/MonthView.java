@@ -1,6 +1,7 @@
 package com.junlong0716.pickerview;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -28,10 +29,11 @@ public class MonthView extends View {
     private Context mContext;
     //文字画笔
     private TextPaint mTextPaint;
-    //文字选中颜色
+    //文字选中画笔
     private TextPaint mTextSelectedPaint;
     //描述文字画笔
     private TextPaint mDesTextPaint;
+    //选中的高亮画笔
     private Paint mSelectedPaint;
     //一星期7天
     private int mDaysInWeek = 7;
@@ -58,6 +60,20 @@ public class MonthView extends View {
     private OnViewCheckedListener mOnViewCheckedListener;
     //单个日期的信息
     private SparseArray<DayBaseEntity> mDaysInfo;
+    //日期正常显示的颜色值
+    private int mCalendarDayCommonTextColor;
+    //日期描述正常显示颜色值
+    private int mCalendarDesCommonTextColor;
+    //日期不可用的颜色值
+    private int mCalendarDayDisableTextColor;
+    //日期选中的背景颜色值
+    private int mCalendarDayCheckedLightColor;
+    //日期选中的文字与描述字体颜色
+    private int mCalendarDayCheckedTextColor;
+    private int mCalendarDesCheckedTextColor;
+    //选中的背景圆角
+    private int mCalendarDayCheckedLightRadius;
+
 
     public MonthView(Context context) {
         super(context);
@@ -68,19 +84,34 @@ public class MonthView extends View {
     public MonthView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mContext = context;
+        initAttrs(attrs);
         init();
     }
 
     public MonthView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         mContext = context;
+        initAttrs(attrs);
         init();
+    }
+
+    private void initAttrs(AttributeSet attrs) {
+        if (attrs == null) return;
+        final TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.MonthView);
+        mCalendarDayCommonTextColor = typedArray.getColor(R.styleable.MonthView_calendarDayCommonTextColor, getResources().getColor(R.color.calendarDayCommonTextColor));
+        mCalendarDesCommonTextColor = typedArray.getColor(R.styleable.MonthView_calendarDesCommonTextColor, getResources().getColor(R.color.calendarDesCommonTextColor));
+        mCalendarDayDisableTextColor = typedArray.getColor(R.styleable.MonthView_calendarDayDisableTextColor, getResources().getColor(R.color.calendarDayDisableTextColor));
+        mCalendarDayCheckedLightColor = typedArray.getColor(R.styleable.MonthView_calendarDayCheckedLightColor, getResources().getColor(R.color.calendarDayCheckedLightColor));
+        mCalendarDayCheckedTextColor = typedArray.getColor(R.styleable.MonthView_calendarDayCheckedTextColor, getResources().getColor(R.color.calendarDayCheckedTextColor));
+        mCalendarDesCheckedTextColor = typedArray.getColor(R.styleable.MonthView_calendarDesCheckedTextColor, getResources().getColor(R.color.calendarDayCheckedTextColor));
+        mCalendarDayCheckedLightRadius = (int) typedArray.getDimension(R.styleable.MonthView_calendarDayCheckedLightRadius, 0);
+        typedArray.recycle();
     }
 
     private void init() {
         mTextPaint = new TextPaint();
         mTextPaint.setAntiAlias(true);
-        mTextPaint.setColor(Color.parseColor("#333333"));
+        mTextPaint.setColor(mCalendarDayCommonTextColor);
         Typeface boldFont = Typeface.create(Typeface.SANS_SERIF, Typeface.BOLD);
         mTextPaint.setTypeface(boldFont);
         mTextPaint.setTextSize(ConvertUtil.dp2px(16f, mContext));
@@ -88,7 +119,7 @@ public class MonthView extends View {
 
         mDesTextPaint = new TextPaint();
         mDesTextPaint.setAntiAlias(true);
-        mDesTextPaint.setColor(Color.parseColor("#FF7E00"));
+        mDesTextPaint.setColor(mCalendarDesCommonTextColor);
         mDesTextPaint.setTextSize(ConvertUtil.dp2px(12f, mContext));
         mDesTextPaint.setTextAlign(Paint.Align.CENTER);
 
@@ -96,10 +127,10 @@ public class MonthView extends View {
         mSelectedPaint.setFilterBitmap(true);
         mSelectedPaint.setAntiAlias(true);
         mSelectedPaint.setDither(true);
-        mSelectedPaint.setColor(Color.parseColor("#29B7B7"));
+        mSelectedPaint.setColor(mCalendarDayCheckedLightColor);
 
         mTextSelectedPaint = new TextPaint();
-        mTextSelectedPaint.setColor(Color.WHITE);
+        mTextSelectedPaint.setColor(mCalendarDayCheckedTextColor);
         mTextSelectedPaint.setAntiAlias(true);
         mTextSelectedPaint.setTypeface(boldFont);
         mTextSelectedPaint.setTextSize(ConvertUtil.dp2px(16f, mContext));
@@ -296,7 +327,7 @@ public class MonthView extends View {
 
 
     private void drawSelectedDesText(Canvas canvas, String des, float x, float y) {
-        mDesTextPaint.setColor(Color.WHITE);
+        mDesTextPaint.setColor(mCalendarDesCheckedTextColor);
         canvas.drawText(des, x, y, mDesTextPaint);
     }
 
@@ -305,24 +336,24 @@ public class MonthView extends View {
     }
 
     private void drawSelectedTextLightBg(Canvas canvas, float x, float y) {
-        canvas.drawRoundRect(new RectF(x - mCellWith / 2f + 10, y - mCellHeight / 2f + 10, x + mCellWith / 2f - 10, y + mCellHeight / 2f - 10), 10, 10, mSelectedPaint);
+        canvas.drawRoundRect(new RectF(x - mCellWith / 2f + 10, y - mCellHeight / 2f + 10, x + mCellWith / 2f - 10, y + mCellHeight / 2f - 10), mCalendarDayCheckedLightRadius, mCalendarDayCheckedLightRadius, mSelectedPaint);
     }
 
     private void drawDesText(Canvas canvas, String des, float x, float y, boolean isDisable) {
         if (isDisable) {
             canvas.drawText("", x, y, mDesTextPaint);
         } else {
-            mDesTextPaint.setColor(Color.parseColor("#FF7E00"));
+            mDesTextPaint.setColor(mCalendarDesCommonTextColor);
             canvas.drawText(des, x, y, mDesTextPaint);
         }
     }
 
     private void drawText(Canvas canvas, int day, float x, float y, boolean isDisable) {
         if (isDisable) {
-            mTextPaint.setColor(Color.parseColor("#cccccc"));
+            mTextPaint.setColor(mCalendarDayDisableTextColor);
             canvas.drawText(day + "", x, y, mTextPaint);
         } else {
-            mTextPaint.setColor(Color.parseColor("#333333"));
+            mTextPaint.setColor(mCalendarDayCommonTextColor);
             canvas.drawText(day + "", x, y, mTextPaint);
         }
     }

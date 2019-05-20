@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MonthView">
+        <attr name="calendarDayCommonTextColor" format="color|reference" />
+        <attr name="calendarDesCommonTextColor" format="color|reference" />
+        <attr name="calendarDayCheckedTextColor" format="color|reference" />
+        <attr name="calendarDesCheckedTextColor" format="color|reference" />
+        <attr name="calendarDayCheckedLightColor" format="color|reference" />
+        <attr name="calendarDayCheckedLightRadius" format="dimension|reference"/>
+        <attr name="calendarDayDisableTextColor" format="color|reference"/>
+    </declare-styleable>
+</resources>
