@@ -11,7 +11,7 @@
 	}
  
     dependencies {
-	        implementation 'com.github.Edison0716:CalendarView:Tag'
+	        implementation 'com.github.Edison0716:CalendarView:v1.0'
 	}
  ```
 
