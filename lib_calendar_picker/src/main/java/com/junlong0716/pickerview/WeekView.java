@@ -48,10 +48,10 @@ public class WeekView extends View {
     }
 
     private void init() {
-        mTextHeight = ConvertUtil.dp2px(20f, mContext);
+        mTextHeight = ConvertUtil.dp2px(mContext,20f);
         mWeekPaint = new TextPaint();
         mWeekPaint.setAntiAlias(true);
-        mWeekPaint.setTextSize((float) ConvertUtil.dp2px(14f, mContext));
+        mWeekPaint.setTextSize((float) ConvertUtil.dp2px( mContext,14f));
         mWeekPaint.setTextAlign(Paint.Align.CENTER);
         mWeekPaint.setColor(Color.parseColor("#7B7B7B"));
         mWeekPaint.setStyle(Paint.Style.FILL);

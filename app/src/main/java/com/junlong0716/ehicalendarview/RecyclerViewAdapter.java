@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.junlong0716.pickerview.DayBaseEntity;
 import com.junlong0716.pickerview.MonthView;
 
 import java.util.List;
@@ -54,7 +55,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         holder.mv.setCheckedDay(mList.get(position).getSetCheckedDay());
         holder.mv.setOnViewCheckedListener(new MonthView.OnViewCheckedListener() {
             @Override
-            public void onViewCheckedListener(int mYear, int mMonth, int mSelectDay) {
+            public void onViewCheckedListener(int mYear, int mMonth, int mSelectDay, DayBaseEntity dayBaseEntity) {
                 mOnDayClickedCallback.setOnDayCheckedListener(mSelectDay, position);
                 Toast.makeText(mContext, mYear + "-" + mMonth + "-" + mSelectDay, Toast.LENGTH_SHORT).show();
             }

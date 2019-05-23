@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import java.util.Calendar;
 import java.util.List;
 
+
 /**
  * FileName: MonthView
  * Author:   EdisonLi的Windows
@@ -76,7 +77,10 @@ public class MonthView extends View {
     private int mCalendarDayTextSize;
     //描述文字大小
     private int mCalendarDesTextSize;
-
+    //记录一下之前选中的那一天
+    private int mCheckedDay = 0;
+    //记录第一次按下的距离Y
+    private float mDownY = 0;
 
     public MonthView(Context context) {
         super(context);
@@ -108,8 +112,8 @@ public class MonthView extends View {
         mCalendarDayCheckedTextColor = typedArray.getColor(R.styleable.MonthView_calendarDayCheckedTextColor, getResources().getColor(R.color.calendarDayCheckedTextColor));
         mCalendarDesCheckedTextColor = typedArray.getColor(R.styleable.MonthView_calendarDesCheckedTextColor, getResources().getColor(R.color.calendarDayCheckedTextColor));
         mCalendarDayCheckedLightRadius = (int) typedArray.getDimension(R.styleable.MonthView_calendarDayCheckedLightRadius, 0);
-        mCalendarDayTextSize = (int) typedArray.getDimension(R.styleable.MonthView_calendarDayTextSize, 14);
-        mCalendarDesTextSize = (int) typedArray.getDimension(R.styleable.MonthView_calendarDesTextSize, 12);
+        mCalendarDayTextSize = (int) typedArray.getDimension(R.styleable.MonthView_calendarDayTextSize, ConvertUtil.dp2px(mContext, 14));
+        mCalendarDesTextSize = (int) typedArray.getDimension(R.styleable.MonthView_calendarDesTextSize, ConvertUtil.dp2px(mContext, 12));
         typedArray.recycle();
     }
 
@@ -144,6 +148,11 @@ public class MonthView extends View {
         mCalendar.setFirstDayOfWeek(Calendar.SUNDAY);
     }
 
+    /**
+     * @param year     显示的年份
+     * @param month    显示的月份
+     * @param daysInfo 与日期其对应的日期包含的信息载体
+     */
     public void setCalendarParams(int year, int month, List<? extends DayBaseEntity> daysInfo) {
         mDaysInfo = new SparseArray<>();
         for (DayBaseEntity day : daysInfo)
@@ -153,8 +162,9 @@ public class MonthView extends View {
         mYear = year;
         mCalendar.set(Calendar.YEAR, mYear);
         mCalendar.set(Calendar.MONTH, mMonth);
+        mCalendar.set(Calendar.DAY_OF_MONTH, 0);
+        mDaysInMonth = mCalendar.get(Calendar.DAY_OF_MONTH);
         mCalendar.set(Calendar.DAY_OF_MONTH, 1);
-        mDaysInMonth = getDaysInMonth(mYear, mMonth);
         mDayOfWeekStart = mCalendar.get(Calendar.DAY_OF_WEEK);
         mWeekStart = mCalendar.getFirstDayOfWeek();
         //判断最大行数
@@ -168,6 +178,7 @@ public class MonthView extends View {
 
     public void setCheckedDay(int day) {
         mSelectDay = day;
+        mCheckedDay = day;
         invalidate();
     }
 
@@ -196,6 +207,7 @@ public class MonthView extends View {
         setMeasuredDimension(widthMeasureSpec, resolveSize(targetHeight, heightMeasureSpec));
     }
 
+
     @Override
     public boolean performClick() {
         return super.performClick();
@@ -209,60 +221,26 @@ public class MonthView extends View {
             case MotionEvent.ACTION_DOWN:
                 performClick();
                 mSelectDay = getDaysLocation(x, y);
-                if (mDaysInfo.get(mSelectDay) == null) {
+                mDownY = event.getY();
+                getParent().requestDisallowInterceptTouchEvent(true);
+                if (mDaysInfo.get(mSelectDay) == null || mDaysInfo.get(mSelectDay).isDisable()) {
+                    mSelectDay = mCheckedDay;
                     return false;
-                } else
-                    return !mDaysInfo.get(mSelectDay).isDisable();
-            case MotionEvent.ACTION_MOVE:
-                Log.d("fuckY",event.getY() + "");
-                if (mDaysInfo.get(mSelectDay) == null || event.getY() > 1 || event.getY() < 1) {
-                    getParent().requestDisallowInterceptTouchEvent(false);
-                    return false;
-                } else
-                    return !mDaysInfo.get(mSelectDay).isDisable();
-            case MotionEvent.ACTION_UP:
-                if (mDaysInfo.get(mSelectDay) == null) {
-                    return false;
-                } else {
-                    if (mDaysInfo.get(mSelectDay).isDisable()) {
-                        return false;
-                    } else {
-                        invalidate();
-                        mOnViewCheckedListener.onViewCheckedListener(mYear, mMonth + 1, mSelectDay);
-                        return true;
-                    }
                 }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (Math.abs(mDownY - event.getY()) > 10) {
+                    mSelectDay = mCheckedDay;
+                    getParent().requestDisallowInterceptTouchEvent(false);
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                invalidate();
+                if (mSelectDay != 0)
+                    mOnViewCheckedListener.onViewCheckedListener(mYear, mMonth + 1, mSelectDay, mDaysInfo.get(mSelectDay));
+                break;
         }
         return true;
-    }
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        int downY = 0;
-        int upY = 0;
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                downY = (int) (event.getY() + 0.5f);
-                Log.d("down", downY + "");
-                break;
-            case MotionEvent.ACTION_UP:
-                upY = (int) (event.getY() + 0.5f);
-                Log.d("up", upY + "");
-                break;
-        }
-
-        Log.d("up", upY + "");
-
-        if (Math.abs(downY) - Math.abs(upY) > 10 || Math.abs(downY) - Math.abs(upY) < -10) {
-            getParent().requestDisallowInterceptTouchEvent(false);
-        } else {
-            //不拦截down事件
-            if (event.getAction() == MotionEvent.ACTION_DOWN || event.getAction() == MotionEvent.ACTION_MOVE)
-                getParent().requestDisallowInterceptTouchEvent(true);
-        }
-
-        return super.dispatchTouchEvent(event);
     }
 
     //根据位置信息找到选中的天数
@@ -275,7 +253,6 @@ public class MonthView extends View {
         int col = paddedX * mDaysInWeek / mPaddedWidth; //列宽 点击位置所在的第几列
         int index = col + row * mDaysInWeek;//点击在第几个格子 一行7个数字 第几行 * 7 + 第几列 = 日期天
         int selectDay = index + 1 - getDayOffset();//这里应该去掉之前的空格
-        Log.d("selectedDay", selectDay + "");
         if (isValidDay(selectDay)) return selectDay;
         else return -1;
     }
@@ -319,6 +296,7 @@ public class MonthView extends View {
         float halfTextLineHeight = (mTextPaint.descent() + mTextPaint.ascent()) / 2f;
 
         for (int day = 1; day <= mDaysInMonth; day++) {
+            //若没有对应的day信息则默认是不可用的
             boolean isDisable = true;
             String des;
             if (mDaysInfo.get(day) == null)
@@ -339,14 +317,14 @@ public class MonthView extends View {
             calendar.set(Calendar.DAY_OF_MONTH, day);
             //高亮
             if (mSelectDay == day)
-                drawSelectedTextLightBg(canvas, (float) colCenter, rowHeightCenter);
+                drawSelectedTextLightBg(canvas, (float) colCenter, rowHeightCenter, isDisable);
 
             if (mSelectDay == day) {
-                drawSelectedText(canvas, String.valueOf(day), (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(8, mContext));
-                drawSelectedDesText(canvas, des, (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext));
+                drawSelectedText(canvas, String.valueOf(day), (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(mContext, 8));
+                drawSelectedDesText(canvas, des, (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(mContext, 20));
             } else {
-                drawDesText(canvas, des, (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(20, mContext), isDisable);
-                drawText(canvas, day, (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(8, mContext), isDisable);
+                drawDesText(canvas, des, (float) colCenter, rowHeightCenter + halfTextLineHeight + ConvertUtil.dp2px(mContext, 20), isDisable);
+                drawText(canvas, day, (float) colCenter, rowHeightCenter - halfTextLineHeight - ConvertUtil.dp2px(mContext, 8), isDisable);
             }
 
             //绘制到了最后一个格子 则从头开始
@@ -357,7 +335,6 @@ public class MonthView extends View {
         }
     }
 
-
     private void drawSelectedDesText(Canvas canvas, String des, float x, float y) {
         mDesTextPaint.setColor(mCalendarDesCheckedTextColor);
         canvas.drawText(des, x, y, mDesTextPaint);
@@ -367,7 +344,8 @@ public class MonthView extends View {
         canvas.drawText(dayString, x, y, mTextSelectedPaint);
     }
 
-    private void drawSelectedTextLightBg(Canvas canvas, float x, float y) {
+    private void drawSelectedTextLightBg(Canvas canvas, float x, float y, boolean isDisable) {
+        if (isDisable) return;
         canvas.drawRoundRect(new RectF(x - mCellWith / 2f + 10, y - mCellHeight / 2f + 10, x + mCellWith / 2f - 10, y + mCellHeight / 2f - 10), mCalendarDayCheckedLightRadius, mCalendarDayCheckedLightRadius, mSelectedPaint);
     }
 
@@ -398,7 +376,6 @@ public class MonthView extends View {
         return day >= 1 && day <= mDaysInMonth;
     }
 
-
     //计算格子的偏移量
     private int getDayOffset() {
         int offset = mDayOfWeekStart - mWeekStart;
@@ -414,6 +391,6 @@ public class MonthView extends View {
     }
 
     public interface OnViewCheckedListener {
-        void onViewCheckedListener(int mYear, int mMonth, int mSelectDay);
+        void onViewCheckedListener(int mYear, int mMonth, int mSelectDay, DayBaseEntity dayBaseEntity);
     }
 }
